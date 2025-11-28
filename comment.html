@@ -1,0 +1,184 @@
+<a href="index.html">Back</a>
+
+
+
+
+
+ <!DOCTYPE html>
+<html>
+<head>
+
+    
+      
+    
+
+
+
+    <title>Comment Section</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef2ff;
+            padding: 20px;
+        
+   
+     }
+
+        .comment-box {
+            width: 400px;
+            background: linear-gradient(135deg, #4b6cb7, #8e44ad);
+            padding: 20px;
+            border-radius: 10px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        input, textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #4f46e5;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #4338ca;
+        }
+
+        .comment {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .username {
+            font-weight: bold;
+        }
+
+        .remove-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #ef4444;
+            border: none;
+            color: white;
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="comment-box">
+    <h2>Comment Section</h2>
+
+    <input type="text" id="username" placeholder="Enter your username">
+    <textarea id="commentText" placeholder="Write a comment..."></textarea>
+    <button onclick="addComment()">Add Comment</button>
+
+    <div id="commentList"></div>
+</div>
+
+<script>
+    // Load saved comments when page opens
+    window.onload = function() {
+        loadComments();
+    };
+
+    function addComment() {
+        const username = document.getElementById("username").value;
+        const commentText = document.getElementById("commentText").value;
+
+        if (username === "" || commentText === "") {
+            alert("Please fill in both username and comment.");
+            return;
+        }
+
+        let comments = JSON.parse(localStorage.getItem("comments")) || [];
+
+        comments.push({
+            username: username,
+            text: commentText
+        });
+
+        localStorage.setItem("comments", JSON.stringify(comments));
+
+        displayComments();
+
+        document.getElementById("username").value = "";
+        document.getElementById("commentText").value = "";
+    }
+
+    function loadComments() {
+        displayComments();
+    }
+
+    function displayComments() {
+        const commentList = document.getElementById("commentList");
+        commentList.innerHTML = "";
+
+        let comments = JSON.parse(localStorage.getItem("comments")) || [];
+
+        comments.forEach((comment, index) => {
+            const commentDiv = document.createElement("div");
+            commentDiv.className = "comment";
+
+            commentDiv.innerHTML = `
+                <span class="username">${comment.username}</span>: ${comment.text}
+                <button class="remove-btn" onclick="removeComment(${index})">Remove</button>
+            `;
+
+            commentList.appendChild(commentDiv);
+        });
+    }
+
+    function removeComment(index) {
+        let comments = JSON.parse(localStorage.getItem("comments")) || [];
+
+        comments.splice(index, 1);
+
+        localStorage.setItem("comments", JSON.stringify(comments));
+
+        displayComments();
+    }
+</script>
+
+
+    <style>
+      
+      body {
+
+       
+       background: linear-gradient(135deg, #4b6cb7, #8e44ad);
+       min-height: 100vh;
+       display: flex;
+       flex-direction: column;
+       
+       justify-content: flex-start;
+       padding: 40px 20px;
+     }
+    </style>
+
+
+
+
+</body>
+</html>
+

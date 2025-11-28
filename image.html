@@ -1,0 +1,187 @@
+<p><a href="index.html">Back</a></p>
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Photo Collections</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4b6cb7, #8e44ad);
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .photo-container {
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+            text-align: center;
+            position: relative;
+        }
+
+        img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .title {
+            margin-top: 8px;
+            font-weight: bold;
+        }
+
+        button {
+            margin-top: 6px;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            background: #5865f2;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* Remove button */
+        .remove-btn {
+            background: #ff4d4d;
+            margin-left: 5px;
+        }
+
+        /* Popup viewer */
+        #viewer {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #viewer img {
+            width: 70%;
+            max-width: 600px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2><p>Random Photos</p></h2>
+
+<input type="file" id="fileInput" accept="image/*">
+<button onclick="addPhoto()">Add Photo</button>
+
+<div class="gallery" id="gallery"></div>
+
+<!-- Image Viewer -->
+<div id="viewer" onclick="closeViewer()">
+    <img id="viewerImg" onclick="event.stopPropagation()">
+</div>
+
+<script>
+    let photos = JSON.parse(localStorage.getItem("galleryPhotos")) || [];
+
+    function save() {
+        localStorage.setItem("galleryPhotos", JSON.stringify(photos));
+    }
+
+    function addPhoto() {
+        let file = document.getElementById("fileInput").files[0];
+        if (!file) return;
+
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            let newTitle = "Unknown ";
+
+            // IF / ELSE TITLE FORMAT
+            if (newTitle === "") newTitle = "Untitled";
+            else if (newTitle.length > 20) newTitle = newTitle.substring(0,20) + "...";
+
+            photos.push({
+                image: e.target.result,
+                title: newTitle
+            });
+
+            save();
+            displayPhotos();
+        };
+        reader.readAsDataURL(file);
+
+        document.getElementById("fileInput").value = "";
+    }
+
+    function renamePhoto(index) {
+        let newTitle = prompt("Enter new title:", photos[index].title);
+        if (newTitle === null) return; // Cancel
+
+        newTitle = newTitle.trim();
+
+        if (newTitle === "") newTitle = "Untitled"; // IF / ELSE
+        else if (newTitle.length > 20) newTitle = newTitle.substring(0,20) + "...";
+
+        photos[index].title = newTitle;
+        save();
+        displayPhotos();
+    }
+
+    function removePhoto(index) {
+        if (!confirm("Are you sure you want to delete this photo?")) return;
+        photos.splice(index,1);
+        save();
+        displayPhotos();
+    }
+
+    function openViewer(src) {
+        document.getElementById("viewerImg").src = src;
+        document.getElementById("viewer").style.display = "flex";
+    }
+
+    function closeViewer() {
+        document.getElementById("viewer").style.display = "none";
+    }
+
+    function displayPhotos() {
+        let gallery = document.getElementById("gallery");
+        gallery.innerHTML = "";
+
+        photos.forEach((p, i) => {
+            gallery.innerHTML += `
+                <div class="photo-container">
+                    <img src="${p.image}" onclick="openViewer('${p.image}')">
+                    <div class="title">${p.title}</div>
+                    <button onclick="renamePhoto(${i})">Rename</button>
+                    <button class="remove-btn" onclick="removePhoto(${i})">Remove</button>
+                </div>
+            `;
+        });
+    }
+
+    displayPhotos();
+</script>
+
+</body>
+</html>
+
